@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lead-classifier"
+version = "0.1.0"
+description = "Lead classification service"
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [
+  { name = "Lead Classifier Team" }
+]
+dependencies = [
+  "fastapi",
+  "uvicorn[standard]",
+  "scikit-learn",
+  "joblib",
+  "redis",
+  "prometheus-client",
+  "pydantic-settings"
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest",
+  "httpx",
+  "ruff",
+  "mypy"
+]
+
+[tool.ruff]
+line-length = 100
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
