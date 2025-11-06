@@ -1,7 +1,8 @@
-from datetime import datetime, timezone
+from datetime import datetime
 
 from fastapi.testclient import TestClient
 
+from app.schemas.lead_created_v1 import LeadCreatedV1
 from app.schemas.lead_intent_v1 import LeadIntentV1
 
 
@@ -16,14 +17,7 @@ def test_health_endpoint_returns_ok(client: TestClient) -> None:
 
 
 def test_classify_endpoint_returns_stubbed_intent(client: TestClient) -> None:
-    payload = {
-        "lead_id": "123",
-        "email": "lead@example.com",
-        "full_name": "Lead Example",
-        "created_at": datetime.now(timezone.utc).isoformat(),
-        "source": "web",
-        "metadata": {"campaign": "spring"},
-    }
+    payload = LeadCreatedV1.example()
 
     response = client.post("/classify", json=payload)
 
@@ -31,9 +25,10 @@ def test_classify_endpoint_returns_stubbed_intent(client: TestClient) -> None:
     body = response.json()
     # Validate schema shape against Pydantic model to ensure compatibility
     LeadIntentV1.model_validate(body)
-    assert body["intent"] == "unknown"
-    assert body["confidence"] == 0.0
-    assert body["reasons"] == []
+    assert body["class"] == "COLD"
+    assert body["score"] == 0.42
+    assert body["tier_thresholds"]["hot"] == 0.8
+    assert body["tier_thresholds"]["warm"] == 0.6
 
 
 def test_metrics_endpoint_exposes_process_metrics(client: TestClient) -> None:
